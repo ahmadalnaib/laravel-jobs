@@ -1,10 +1,26 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
+use App\Jobs\Server\InstallPHP;
+use App\Jobs\Server\CreateServer;
+use App\Jobs\Server\InstallNginx;
+use App\Jobs\Server\FinalizeServer;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ProfileController;
 
 Route::get('/', function () {
     return view('welcome');
+});
+
+Route::get('/servers', function () {
+
+    Bus::batch([
+        new CreateServer(),
+        new InstallNginx(),
+        new InstallPHP(),
+        new FinalizeServer(),
+    ])->dispatch();
+   
 });
 
 Route::get('/dashboard', function () {
